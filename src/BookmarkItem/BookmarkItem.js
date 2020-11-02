@@ -1,5 +1,6 @@
 import React from 'react';
 import Rating from '../Rating/Rating';
+import DeleteButton from '../DeleteButton/DeleteButton'
 import './BookmarkItem.css';
 
 export default function BookmarkItem(props) {
@@ -20,17 +21,16 @@ export default function BookmarkItem(props) {
         {props.bm_description}
       </p>
       <div className='BookmarkItem__buttons'>
-        <button
+        <DeleteButton
           className='BookmarkItem__description'
-          onClick={() => props.onClickDelete(props.bm_id)}
-        >
-          Delete
-        </button>
+          bm_id={props.bm_id}
+          onDeleteBookmark={props.onDeleteBookmark}
+        />
       </div>
     </li>
   )
 }
 
 BookmarkItem.defaultProps = {
-  onClickDelete: () => {},
+  onDeleteBookmark: () => {},
 }

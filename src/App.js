@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AddBookmark from './AddBookmark/AddBookmark';
+import BookmarkForm from './BookmarkForm/BookmarkForm';
 import BookmarkList from './BookmarkList/BookmarkList';
 import Nav from './Nav/Nav';
 import config from './config';
@@ -50,7 +50,13 @@ class App extends Component {
 
   addBookmark = bookmark => {
     this.setState({
-      bookmarks: [ ...this.state.bookmarks, bookmark ],
+      bookmarks: [...this.state.bookmarks, bookmark],
+    })
+  }
+
+  deleteBookmark = bm_id => {
+    this.setState({
+      bookmarks: [...this.state.bookmarks.filter(bm => bm.bm_id !== bm_id)]
     })
   }
 
@@ -80,13 +86,14 @@ class App extends Component {
         <Nav clickPage={this.changePage} />
         <div className='content' aria-live='polite'>
           {page === 'add' && (
-            <AddBookmark
+            <BookmarkForm
               onAddBookmark={this.addBookmark}
               onClickCancel={() => this.changePage('list')}
             />
           )}
           {page === 'list' && (
             <BookmarkList
+              onDeleteBookmark={this.deleteBookmark}
               bookmarks={bookmarks}
             />
           )}

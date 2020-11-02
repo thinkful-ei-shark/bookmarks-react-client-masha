@@ -1,30 +1,61 @@
-import React, { Component } from  'react';
+import React, { Component } from 'react';
 import config from '../config'
-import './AddBookmark.css';
+import './BookmarkForm.css';
 
 const Required = () => (
-  <span className='AddBookmark__required'>*</span>
+  <span className='BookmarkForm__required'>*</span>
 )
 
-class AddBookmark extends Component {
+class BookmarkForm extends Component {
   static defaultProps = {
-    onAddBookmark: () => {}
+    onBookmarkForm: () => { },
+    bookmark: null
   };
 
   state = {
     error: null,
-  };
+    bookmark: {
+      bm_title: {
+        value: '',
+        touched: false
+      },
+      bm_url: {
+        value: 'https://',
+        touched: false
+      },
+      bm_description: {
+        value: '',
+        touched: false
+      },
+      bm_rating: {
+        value: '',
+        touched: false
+      }
+    }
+  }
+
+  onFieldChange = (target) => {
+    const bookmark = { ...this.state.bookmark };
+    const field = target.name;
+    const value = target.value
+    bookmark[field] = { value, touched: true }
+    this.setState({ bookmark })
+  }
 
   handleSubmit = e => {
     e.preventDefault()
-    // get the form fields from the event
-    const { bm_title, bm_url, bm_description, bm_rating } = e.target
-    const bookmark = {
-      bm_title: bm_title.value,
-      bm_url: bm_url.value,
-      bm_description: bm_description.value,
-      bm_rating: bm_rating.value,
-    }
+    // const bookmark = {
+    //   bm_title: this.state.bookmark.bm_title.value,
+    //   bm_url: this.state.bookmark.bm_url.value,
+    //   bm_description: this.state.bookmark.bm_description.value,
+    //   bm_rating: this.state.bookmark.bm_rating.value
+    // }
+    const bookmark = {};
+    Object.keys(this.state.bookmark).forEach(k => {
+      if (this.state.bookmark[k].touched){
+        bookmark[k] = this.state.bookmark[k].value
+      }
+    })
     this.setState({ error: null })
     fetch(config.API_ENDPOINT, {
       method: 'POST',
@@ -45,10 +76,9 @@ class AddBookmark extends Component {
         return res.json()
       })
       .then(data => {
-        bm_title.value = ''
-        bm_url.value = ''
-        bm_description.value = ''
-        bm_rating.value = ''
+        const bookmark = { ...this.state.bookmark };
+        Object.keys(bookmark).forEach(k => bookmark[k].touched = false)
+        this.setState({ bookmark })
         this.props.onAddBookmark(data)
       })
       .catch(error => {
@@ -56,17 +86,21 @@ class AddBookmark extends Component {
       })
   }
 
+  // componentDidMount() {
+
+  // }
+
   render() {
     const { error } = this.state
     const { onClickCancel } = this.props
     return (
-      <section className='AddBookmark'>
+      <section className='BookmarkForm'>
         <h2>Create a bookmark</h2>
         <form
-          className='AddBookmark__form'
+          className='BookmarkForm__form'
           onSubmit={this.handleSubmit}
         >
-          <div className='AddBookmark__error' role='alert'>
+          <div className='BookmarkForm__error' role='alert'>
             {error && <p>{error.message}</p>}
           </div>
           <div>
@@ -81,6 +115,8 @@ class AddBookmark extends Component {
               id='bm_title'
               placeholder='Great website!'
               required
+              value={this.state.bookmark.bm_title.value}
+              onChange={e => this.onFieldChange(e.target)}
             />
           </div>
           <div>
@@ -95,6 +131,8 @@ class AddBookmark extends Component {
               id='bm_url'
               placeholder='https://www.great-website.com/'
               required
+              value={this.state.bookmark.bm_url.value}
+              onChange={e => this.onFieldChange(e.target)}
             />
           </div>
           <div>
@@ -104,6 +142,8 @@ class AddBookmark extends Component {
             <textarea
               name='bm_description'
               id='bm_description'
+              value={this.state.bookmark.bm_description.value}
+              onChange={e => this.onFieldChange(e.target)}
             />
           </div>
           <div>
@@ -116,13 +156,14 @@ class AddBookmark extends Component {
               type='number'
               name='bm_rating'
               id='bm_rating'
-              defaultValue='1'
               min='1'
               max='5'
               required
+              value={this.state.bookmark.bm_rating.value}
+              onChange={e => this.onFieldChange(e.target)}
             />
           </div>
-          <div className='AddBookmark__buttons'>
+          <div className='BookmarkForm__buttons'>
             <button type='button' onClick={onClickCancel}>
               Cancel
             </button>
@@ -137,4 +178,4 @@ class AddBookmark extends Component {
   }
 }
 
-export default AddBookmark;
+export default BookmarkForm;

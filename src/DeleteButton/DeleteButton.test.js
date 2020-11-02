@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AddBookmark from './AddBookmark';
+import DeleteButton from './DeleteButton';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<AddBookmark />, div);
+  ReactDOM.render(<DeleteButton />, div);
   ReactDOM.unmountComponentAtNode(div);
-});
+})

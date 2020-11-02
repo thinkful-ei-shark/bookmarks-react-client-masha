@@ -16,6 +16,7 @@ class BookmarkList extends Component {
           {bookmarks.map(bookmark =>
             <BookmarkItem
               key={bookmark.bm_id}
+              onDeleteBookmark={this.props.onDeleteBookmark}
               {...bookmark}
             />
           )}
