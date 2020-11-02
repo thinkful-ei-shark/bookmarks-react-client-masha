@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import BookmarkForm from './BookmarkForm/BookmarkForm';
 import BookmarkList from './BookmarkList/BookmarkList';
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import Nav from './Nav/Nav';
 import config from './config';
 import './App.css';
@@ -31,14 +32,10 @@ const bookmarks = [
 
 class App extends Component {
   state = {
-    page: 'list',
     bookmarks,
     error: null,
   };
 
-  changePage = (page) => {
-    this.setState({ page })
-  }
 
   setBookmarks = bookmarks => {
     this.setState({
@@ -79,25 +76,42 @@ class App extends Component {
   }
 
   render() {
-    const { page, bookmarks } = this.state
+    const { bookmarks } = this.state
     return (
       <main className='App'>
         <h1>Bookmarks!</h1>
-        <Nav clickPage={this.changePage} />
-        <div className='content' aria-live='polite'>
-          {page === 'add' && (
-            <BookmarkForm
-              onAddBookmark={this.addBookmark}
-              onClickCancel={() => this.changePage('list')}
-            />
-          )}
-          {page === 'list' && (
-            <BookmarkList
-              onDeleteBookmark={this.deleteBookmark}
-              bookmarks={bookmarks}
-            />
-          )}
-        </div>
+        <BrowserRouter>
+          <Nav clickPage={this.changePage} />
+          <div className='content' aria-live='polite'>
+            <Switch>
+              <Route 
+                path='/add'
+                render={ () =>
+                  <BookmarkForm
+                    onAddBookmark={this.addBookmark}
+                  />}
+              />
+              <Route
+                exact path='/'
+                render={ () =>
+                  <BookmarkList
+                    onDeleteBookmark={this.deleteBookmark}
+                    bookmarks={bookmarks}
+                  />
+                }
+              />
+              <Route
+                path='/edit/:bm_id'
+                render={ (routeProps) =>
+                  <BookmarkForm
+                    onEditBookmark={this.editBookmark}
+                    bm_id={routeProps.match.params.bm_id}
+                  />
+                }
+              />
+            </Switch>
+          </div>
+        </BrowserRouter>
       </main>
     );
   }
