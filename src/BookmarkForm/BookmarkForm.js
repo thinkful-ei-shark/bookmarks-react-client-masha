@@ -8,7 +8,8 @@ const Required = () => (
 
 class BookmarkForm extends Component {
   static defaultProps = {
-    onBookmarkForm: () => { },
+    onAddBookmark: () => {},
+    onEditBookmark: () => {},
     bookmark: null
   };
 
@@ -57,8 +58,10 @@ class BookmarkForm extends Component {
       }
     })
     this.setState({ error: null })
-    fetch(config.API_ENDPOINT, {
-      method: 'POST',
+    const bm_id = this.props.bm_id || '';
+    const method = bm_id ? 'PATCH' : 'POST';
+    fetch(`${config.API_ENDPOINT}/${bm_id}`, {
+      method,
       body: JSON.stringify(bookmark),
       headers: {
         'content-type': 'application/json',
@@ -66,6 +69,7 @@ class BookmarkForm extends Component {
       }
     })
       .then(res => {
+        if(!res) return bookmark;
         if (!res.ok) {
           // get the error message from the response,
           return res.json().then(error => {
@@ -73,22 +77,57 @@ class BookmarkForm extends Component {
             throw error
           })
         }
-        return res.json()
+        return res.status === 204 ?
+          bookmark : res.json();
       })
       .then(data => {
         const bookmark = { ...this.state.bookmark };
         Object.keys(bookmark).forEach(k => bookmark[k].touched = false)
         this.setState({ bookmark })
-        this.props.onAddBookmark(data)
+        bm_id 
+          ? this.props.onEditBookmark(data, Number(bm_id)) 
+          : this.props.onAddBookmark(data)
       })
       .catch(error => {
         this.setState({ error })
       })
   }
 
-  // componentDidMount() {
-
-  // }
+  componentDidMount() {
+    const bm_id = this.props.bm_id;
+    if(bm_id){
+      fetch(`${config.API_ENDPOINT}/${bm_id}`, {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${config.API_KEY}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const { bm_title, bm_url, bm_description, bm_rating } = data;
+        this.setState({
+          bookmark: {
+            bm_title: {
+              value: bm_title,
+              touched: false
+            },
+            bm_url: {
+              value: bm_url,
+              touched: false
+            },
+            bm_description: {
+              value: bm_description,
+              touched: false
+            },
+            bm_rating: {
+              value: bm_rating,
+              touched: false
+            }
+          }
+        })
+      });
+    }
+  }
 
   render() {
     const { error } = this.state

@@ -51,6 +51,17 @@ class App extends Component {
     })
   }
 
+  editBookmark = (bookmark, bm_id) => {
+    const updatedBmList = 
+      this.state.bookmarks.filter(item => item.bm_id !== bm_id);
+    const updatedBookmark = 
+      this.state.bookmarks.find(item => item.bm_id === bm_id)
+    Object.assign(updatedBookmark, bookmark);
+    this.setState({
+      bookmarks: [...updatedBmList, updatedBookmark]
+    });
+  }
+
   deleteBookmark = bm_id => {
     this.setState({
       bookmarks: [...this.state.bookmarks.filter(bm => bm.bm_id !== bm_id)]
